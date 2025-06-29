@@ -4,8 +4,10 @@
 namespace output {
     /* Helper functions */
 
-    static std::string toString(ast::BuiltInType type) {
+    std::string toString(ast::BuiltInType type) {
         switch (type) {
+            case ast::BuiltInType::UNDEF:
+                return "undef";
             case ast::BuiltInType::INT:
                 return "int";
             case ast::BuiltInType::BOOL:
@@ -18,6 +20,24 @@ namespace output {
                 return "string";
             default:
                 return "unknown";
+        }
+    }
+    std::string toStringCapital(ast::BuiltInType type) {
+        switch (type) {
+            case ast::BuiltInType::UNDEF:
+                return "UNDEF";
+            case ast::BuiltInType::INT:
+                return "INT";
+            case ast::BuiltInType::BOOL:
+                return "BOOL";
+            case ast::BuiltInType::BYTE:
+                return "BYTE";
+            case ast::BuiltInType::VOID:
+                return "VOID";
+            case ast::BuiltInType::STRING:
+                return "STRING";
+            default:
+                return "UNKNOWN";
         }
     }
 
