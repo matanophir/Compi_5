@@ -145,7 +145,7 @@ void SemanticVisitor::visit(ast::ArrayDereference &node) {
     }
 
     node.computedType = node.id->computedType;
-    node.computedIsArray = true;
+    // computedIsArray is already set to false. its a dereference and there cannot be an array. 
 
 }
 
@@ -155,11 +155,13 @@ void SemanticVisitor::visit(ast::Assign &node) {
 
     Symbol* symbol = symTable.lookup(node.id->value); // was found in the symbol table
 
-    if (node.exp->computedIsArray)
-        output::errorMismatch(node.line);
-
     if (symbol->isArray) 
         output::ErrorInvalidAssignArray(node.id->line, node.id->value);
+
+
+    if (node.exp->computedIsArray){
+        output::errorMismatch(node.line);
+    }
 
     if (!_can_assign(node.exp->computedType, symbol->type)) {
         output::errorMismatch(node.line);
@@ -178,10 +180,15 @@ void SemanticVisitor::visit(ast::ArrayAssign &node) {
 
     Symbol* symbol = symTable.lookup(node.id->value); // was found in the symbol table
 
+    if (node.exp->computedIsArray){
+        output::errorMismatch(node.line);
+    }
+
     if (symbol->isArray == false) 
     {
         output::errorMismatch(node.id->line);
     }
+
     if (!_can_assign(node.exp->computedType, symbol->type)) 
     {
         output::errorMismatch(node.line);
@@ -200,7 +207,7 @@ void SemanticVisitor::visit(ast::Cast &node) {
     if (node.exp->computedType == node.target_type->computedType) {
         // OK
     }else {
-        if (!(_is_numeric(node.exp->computedType) && _is_numeric(node.exp->computedType))){
+        if (!(_is_numeric(node.exp->computedType) && _is_numeric(node.target_type->computedType))){
             output::errorMismatch(node.line);
         }
     }
@@ -253,6 +260,12 @@ void SemanticVisitor::visit(ast::Statements &node) {
 
 }
 
+void SemanticVisitor::visit(ast::Block &node) {
+    symTable.enterScope();
+    node.statements->accept(*this);
+    symTable.exitScope();
+}
+
 void SemanticVisitor::visit(ast::Break &node) {
     if (!in_while) {
         output::errorUnexpectedBreak(node.line);
@@ -302,7 +315,6 @@ void SemanticVisitor::visit(ast::Return &node) {
 }
 
 void SemanticVisitor::visit(ast::If &node) {
-    symTable.enterScope();
     node.condition->accept(*this);
     if (node.condition->computedType != ast::BuiltInType::BOOL) {
         output::errorMismatch(node.condition->line);
@@ -311,17 +323,15 @@ void SemanticVisitor::visit(ast::If &node) {
     symTable.enterScope();
     node.then->accept(*this);
     symTable.exitScope();
-    symTable.exitScope();
+
     if (node.otherwise) {
         symTable.enterScope();
         node.otherwise->accept(*this);
         symTable.exitScope();
     }
-    // symTable.exitScope();
 }
 
 void SemanticVisitor::visit(ast::While &node) {
-    symTable.enterScope();
     in_while = true; // Set the flag to indicate we're in a while loop
 
     node.condition->accept(*this);
@@ -330,12 +340,10 @@ void SemanticVisitor::visit(ast::While &node) {
     }
 
     symTable.enterScope();
-
     node.body->accept(*this);
-
     symTable.exitScope();
+    
     in_while = false; // Reset the flag after exiting the while loop
-    symTable.exitScope();
 }
 
 void SemanticVisitor::visit(ast::VarDecl &node) {
@@ -353,6 +361,11 @@ void SemanticVisitor::visit(ast::VarDecl &node) {
 
     if (node.init_exp) {
         node.init_exp->accept(*this);
+
+        if (node.init_exp->computedIsArray) {
+            output::errorMismatch(node.line);
+        }
+
         // If there is an initial value, check if it matches the type
         if (!_can_assign(node.init_exp->computedType, node.type->computedType)) {
             output::errorMismatch(node.line);
@@ -410,6 +423,7 @@ void SemanticVisitor::visit(ast::Funcs &node) {
             formal->type->accept(*this);
             paramTypes.push_back(formal->type->computedType);
         }
+        func->return_type->accept(*this);
         symTable.addFunc(func->id->value, func->return_type->computedType, func->id->line, paramTypes);
     }
 

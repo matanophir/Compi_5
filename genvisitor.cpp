@@ -84,6 +84,10 @@ void GenVisitor::visit(ast::Statements &node) {
     // TODO: Implement code generation for statement sequences
 }
 
+void GenVisitor::visit(ast::Block &node) {
+    // TODO: Implement code generation for block statements
+}
+
 void GenVisitor::visit(ast::Break &node) {
     // TODO: Implement code generation for break statements
 }

@@ -54,18 +54,10 @@ namespace ast {
         Exp() = default;
         BuiltInType computedType = BuiltInType::VOID;
         bool computedIsArray = false;
-
-        std::string var;
-        std::string true_label;
-        std::string false_label;
     };
 
     /* Base class for all statements */
     class Statement : virtual public Node {
-        public:
-        Statement() = default;
-        
-        std::string next_label;
     };
 
     /* Number literal */
@@ -342,6 +334,20 @@ namespace ast {
 
         // Method to add a statement at the end of the list
         void push_back(const std::shared_ptr<Statement> &statement);
+
+        void accept(Visitor &visitor) override {
+            visitor.visit(*this);
+        }
+    };
+
+    /* Block statement - wraps statements with scope management */
+    class Block : public Statement {
+    public:
+        // Statements inside the block
+        std::shared_ptr<Statements> statements;
+
+        // Constructor that receives statements
+        explicit Block(std::shared_ptr<Statements> statements) : statements(statements) {}
 
         void accept(Visitor &visitor) override {
             visitor.visit(*this);
