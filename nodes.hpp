@@ -54,10 +54,18 @@ namespace ast {
         Exp() = default;
         BuiltInType computedType = BuiltInType::VOID;
         bool computedIsArray = false;
+
+        std::string var;
+        std::string true_label;
+        std::string false_label;
     };
 
     /* Base class for all statements */
     class Statement : virtual public Node {
+        public:
+        Statement() = default;
+        
+        std::string next_label;
     };
 
     /* Number literal */

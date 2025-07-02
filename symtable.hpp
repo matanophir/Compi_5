@@ -57,7 +57,7 @@ private:
 
 public:
     SymTable();
-    ~SymTable() { printScopes(); }
+    // ~SymTable() { printScopes(); }
     
     // Scope management
     void enterScope();
