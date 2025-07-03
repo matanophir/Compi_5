@@ -1,6 +1,7 @@
 #include "output.hpp"
 #include "nodes.hpp"
 #include "semanticvisitor.hpp"
+#include "genvisitor.hpp"
 
 // Extern from the bison-generated parser
 extern int yyparse();
@@ -14,4 +15,8 @@ int main() {
     // run semantic analysis
     SemanticVisitor semanticVisitor;
     program->accept(semanticVisitor);
+
+    // run code generation
+    GenVisitor genVisitor;
+    program->accept(genVisitor);
 }

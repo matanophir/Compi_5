@@ -1,11 +1,31 @@
 #include "genvisitor.hpp"
+#include <iostream>
+
+using namespace std;
 
 GenVisitor::GenVisitor() {
-    // Constructor implementation
+    buffer.emit(R"(declare i32 @printf(i8*, ...)
+declare void @exit(i32)
+@.int_specifier = constant [4 x i8] c"%d\0A\00"
+@.str_specifier = constant [4 x i8] c"%s\0A\00"
+
+define void @printi(i32) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.int_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i32 %0)
+    ret void
+}
+
+define void @print(i8*) {
+    %spec_ptr = getelementptr [4 x i8], [4 x i8]* @.str_specifier, i32 0, i32 0
+    call i32 (i8*, ...) @printf(i8* %spec_ptr, i8* %0)
+    ret void
+}
+
+)");
 }
 
 GenVisitor::~GenVisitor() {
-    // Destructor implementation
+    cout << buffer ;
 }
 
 // Expression nodes
@@ -118,17 +138,40 @@ void GenVisitor::visit(ast::Assign &node) {
 
 // Function-related nodes
 void GenVisitor::visit(ast::Formal &node) {
-    // TODO: Implement code generation for formal parameters
+    buffer << output::toLl(node.type->computedType) ;
 }
 
 void GenVisitor::visit(ast::Formals &node) {
-    // TODO: Implement code generation for formal parameter lists
+    for (auto& formal : node.formals) {
+        formal->accept(*this);
+        if (&formal != &node.formals.back()) {
+            buffer << ", ";
+        }
+    }
 }
 
 void GenVisitor::visit(ast::FuncDecl &node) {
-    // TODO: Implement code generation for function declarations
+    string funcName = node.id->value;
+    string returnType = output::toString(node.return_type->computedType);
+
+    buffer << "define " << returnType << " @" << funcName << "(";
+
+    node.formals->accept(*this);
+
+    buffer << ") {\n";
+
+    buffer.indent();
+
+    node.body->accept(*this);
+
+    buffer.unindent();
+    buffer << "}\n";
+    
 }
 
 void GenVisitor::visit(ast::Funcs &node) {
-    // TODO: Implement code generation for function sequences
+    
+    for (auto &func : node.funcs) {
+        func->accept(*this);
+    }
 }

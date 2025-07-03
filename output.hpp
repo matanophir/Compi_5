@@ -11,6 +11,7 @@ namespace output {
     /* Error handling functions */
     std::string toString(ast::BuiltInType type); 
     std::string toStringCapital(ast::BuiltInType type);
+    std::string toLl(ast::BuiltInType type);
 
     void errorLex(int lineno);
 
@@ -79,6 +80,7 @@ namespace output {
         int labelCount;
         int varCount;
         int stringCount;
+        int indentLevel;
 
         friend std::ostream &operator<<(std::ostream &os, const CodeBuffer &buffer);
 
@@ -109,6 +111,15 @@ namespace output {
 
         // Emits a string into the buffer
         void emit(const std::string &str);
+
+        // Increase indentation level
+        void indent();
+
+        // Decrease indentation level
+        void unindent();
+
+        // Returns current indentation as a string
+        std::string ind() const;
 
         // Template overload for general types
         template<typename T>

@@ -65,7 +65,7 @@ public:
     Scope& getCurrentScope();
     
     // Symbol management
-    void addVar(const std::string& name, ast::BuiltInType type, int lineno, bool isArray = false, int arrLength = -1);
+    int addVar(const std::string& name, ast::BuiltInType type, int lineno, bool isArray = false, int arrLength = -1);
     void addFunc(const std::string& name, ast::BuiltInType returnType, int lineno,
                  const std::vector<ast::BuiltInType>& paramTypes);
     void addParam(const std::string& name, ast::BuiltInType type, int lineno);

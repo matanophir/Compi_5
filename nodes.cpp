@@ -73,8 +73,8 @@ namespace ast {
             : Statement(), condition(std::move(condition)),
               body(std::move(body)) {}
 
-    VarDecl::VarDecl(std::shared_ptr<ID> id, std::shared_ptr<Type> type, std::shared_ptr<Exp> init_exp)
-            : Statement(), id(std::move(std::move(id))), type(std::move(type)), init_exp(std::move(init_exp)) {}
+    VarDecl::VarDecl(std::shared_ptr<ID> id, std::shared_ptr<Type> type, std::shared_ptr<Exp> init_exp, int offset)
+            : Statement(), id(std::move(std::move(id))), type(std::move(type)), init_exp(std::move(init_exp)), computedOffset(offset) {}
 
     Assign::Assign(std::shared_ptr<ID> id, std::shared_ptr<Exp> exp)
             : Statement(), id(std::move(id)), exp(std::move(exp)) {}

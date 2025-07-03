@@ -54,10 +54,18 @@ namespace ast {
         Exp() = default;
         BuiltInType computedType = BuiltInType::VOID;
         bool computedIsArray = false;
+
+        std::string var;
+        std::string true_label;
+        std::string false_label;
     };
 
     /* Base class for all statements */
     class Statement : virtual public Node {
+        public:
+        Statement() = default;
+        
+        std::string next_label;
     };
 
     /* Number literal */
@@ -427,8 +435,10 @@ namespace ast {
         // Initial value of the variable. If the variable is not initialized, this field is nullptr
         std::shared_ptr<Exp> init_exp;
 
+        int computedOffset = -1; // Offset in the stack frame for this variable, used in code generation
+
         // Constructor that receives the identifier, the type, and the initial value expression
-        VarDecl(std::shared_ptr<ID> id, std::shared_ptr<Type> type, std::shared_ptr<Exp> init_exp = nullptr);
+        VarDecl(std::shared_ptr<ID> id, std::shared_ptr<Type> type, std::shared_ptr<Exp> init_exp = nullptr, int offset = -1);
 
         void accept(Visitor &visitor) override {
             visitor.visit(*this);

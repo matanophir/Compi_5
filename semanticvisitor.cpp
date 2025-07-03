@@ -355,7 +355,7 @@ void SemanticVisitor::visit(ast::VarDecl &node) {
         arrayLength = node.type->computedArrLength;
     }
 
-    symTable.addVar(node.id->value, node.type->computedType, node.id->line, node.type->computedIsArray, arrayLength);
+    node.computedOffset= symTable.addVar(node.id->value, node.type->computedType, node.id->line, node.type->computedIsArray, arrayLength);
 
     node.id->accept(*this);
 

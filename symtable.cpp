@@ -55,7 +55,7 @@ Scope& SymTable::getCurrentScope() {
     return scopesStack.top();
 }
 
-void SymTable::addVar(const std::string& name, ast::BuiltInType type, int lineno, bool isArray, int arrLength) {
+int SymTable::addVar(const std::string& name, ast::BuiltInType type, int lineno, bool isArray, int arrLength) {
 
     _check_before_add(name, lineno);
     
@@ -78,6 +78,8 @@ void SymTable::addVar(const std::string& name, ast::BuiltInType type, int lineno
         // Increment offset by 1 for regular variables
         offsetsStack.top() += 1;
     }
+
+    return currentOffset;
 }
 
 void SymTable::addFunc(const std::string& name, ast::BuiltInType returnType, int lineno,

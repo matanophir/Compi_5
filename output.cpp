@@ -41,6 +41,25 @@ namespace output {
         }
     }
 
+    std::string toLl(ast::BuiltInType type) {
+        switch (type) {
+            case ast::BuiltInType::UNDEF:
+                return "undef";
+            case ast::BuiltInType::INT:
+                return "i32";
+            case ast::BuiltInType::BOOL:
+                return "i1";
+            case ast::BuiltInType::BYTE:
+                return "i8";
+            case ast::BuiltInType::VOID:
+                return "void";
+            case ast::BuiltInType::STRING:
+                return "i8*"; // Pointer to string
+            default:
+                return "unknown";
+        }
+    }
+
     /* Error handling functions */
 
     void errorLex(int lineno) {
@@ -174,7 +193,7 @@ namespace output {
 
     /* CodeBuffer class */
 
-    CodeBuffer::CodeBuffer() : labelCount(0), varCount(0), stringCount(0) {}
+    CodeBuffer::CodeBuffer() : labelCount(0), varCount(0), stringCount(0), indentLevel(0) {}
 
     std::string CodeBuffer::freshLabel() {
         return "%label_" + std::to_string(labelCount++);
@@ -191,7 +210,22 @@ namespace output {
     }
 
     void CodeBuffer::emit(const std::string &str) {
-        buffer << str << std::endl;
+        std::string spaces(indentLevel * 4, ' ');
+        buffer << spaces << str << std::endl;
+    }
+
+    void CodeBuffer::indent() {
+        indentLevel++;
+    }
+
+    void CodeBuffer::unindent() {
+        if (indentLevel > 0) {
+            indentLevel--;
+        }
+    }
+
+    std::string CodeBuffer::ind() const {
+        return std::string(indentLevel * 4, ' ');
     }
 
     void CodeBuffer::emitLabel(const std::string &label) {
